@@ -1,7 +1,5 @@
-on:
-  push:
-    tags:
-      - '*'
+on: [push]
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -20,7 +18,7 @@ jobs:
           CI: true
       - name: Generate build
         run: npm run build
-        
+
       # Share artifact inside workflow
       - name: Share artifact inside workflow
         uses: actions/upload-artifact@v1
