@@ -38,5 +38,5 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           password: ${{ secrets.SERVER_PASSWORD }}
           port: ${{ secrets.SERVER_PORT }}
-          source: "build"
+          source: "/build"
           target: ${{ secrets.PROJECT_PATH }}
