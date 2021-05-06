@@ -12,7 +12,7 @@ jobs:
           node-version: 12.x
       - name: Install dependencies
         run: npm install    
-      - name: Test
+      - name: Run Test
         run: npm test
         env:
           CI: true
@@ -38,5 +38,5 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           password: ${{ secrets.SERVER_PASSWORD }}
           port: ${{ secrets.SERVER_PORT }}
-          source: "/build"
+          source: "./build"
           target: ${{ secrets.PROJECT_PATH }}
