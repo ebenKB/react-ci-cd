@@ -31,6 +31,7 @@ jobs:
     # Then we can start with deployment
     needs: build
     steps:
+      - uses: actions/checkout@master
       - name: Get artifact
         uses: actions/download-artifact@v1
         with:
