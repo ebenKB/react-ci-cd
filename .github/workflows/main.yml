@@ -5,11 +5,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clone repository
-        uses: actions/checkout@v1
-      - name: Use Node.js 14.x
+        uses: actions/checkout@v2
+      - name: Use Node.js 12.x
         uses: actions/setup-node@v1
         with:
-          node-version: 14.x
+          node-version: 12.x
       - name: Install dependencies
         run: npm install    
       - name: Run Test
@@ -19,45 +19,40 @@ jobs:
       - name: Generate build
         run: npm run build
 
-      - name: Deploy to Server
-      uses: easingthemes/ssh-deploy@v2.1.5
-      env:
-          # SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
-          ARGS: "-rltgoDzvO --delete"
-          SOURCE: "build/"
-          REMOTE_HOST: ${{ secrets.SERVER_IP }}
-          REMOTE_USER: ${{ secrets.SERVER_USERNAME }}
-          TARGET: ${{ secrets.PROJECT_PATH }}
-          EXCLUDE: "/dist/, /node_modules/"
-        
-  # deploy:
-  #   runs-on: ubuntu-latest
-  #   # When application is successfully tested and build has been generated
-  #   # Then we can start with deployment
-  #   needs: build
-  #   steps:
-  #     - uses: actions/checkout@master
-  #     - name: Get artifact
-  #       uses: actions/download-artifact@v1
-  #       with:
-  #         name: build
+      # Share artifact inside workflow
+      - name: Share artifact inside workflow
+        uses: actions/upload-artifact@v1
+        with:
+          name: build
+          path: build
+  deploy:
+    runs-on: ubuntu-latest
+    # When application is successfully tested and build has been generated
+    # Then we can start with deployment
+    needs: build
+    steps:
+      - uses: actions/checkout@master
+      - name: Get artifact
+        uses: actions/download-artifact@v1
+        with:
+          name: build
 
-  #     # copy build files to the remote server
-  #     - name: copy file to server via ssh
-  #       uses: appleboy/scp-action@master
-  #       with: 
-  #         host: ${{ secrets.SERVER_IP }}
-  #         username: ${{ secrets.SERVER_USERNAME }}
-  #         password: ${{ secrets.SERVER_PASSWORD }}
-  #         port: ${{ secrets.SERVER_PORT }}
-  #         source: "build/*"
-  #         target: ${{ secrets.PROJECT_PATH }}
-  #         rm: true
+      # copy build files to the remote server
+      - name: copy file to server via ssh
+        uses: appleboy/scp-action@master
+        with: 
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          port: ${{ secrets.SERVER_PORT }}
+          source: "build/*"
+          target: ${{ secrets.PROJECT_PATH }}
+          rm: true
   
   # start the server and serve all assets
   start:
     runs-on: ubuntu-latest
-    needs: build
+    needs: deploy
     steps:
       - name: start the server and serve assets
         uses: appleboy/ssh-action@master
